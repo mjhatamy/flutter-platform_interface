@@ -8,12 +8,14 @@ class PlatformLocale {
   PlatformLocale(MethodChannel channel) {
     this._channel = channel;
   }
+
   /// Returns a [String] of the currently set DEVICE locale made up of the language and the region
   /// (e.g. en-US or en_US)
   Future<Locale> get currentLocale async {
-    final String currentLocaleString = await _channel.invokeMethod('currentLocale');
+    final String currentLocaleString =
+        await _channel.invokeMethod('currentLocale');
     Map<String, dynamic> currentLocaleJson = jsonDecode(currentLocaleString);
-    if(currentLocaleJson != null) {
+    if (currentLocaleJson != null) {
       return _localeFromJson(currentLocaleJson);
     }
     return null;
@@ -25,9 +27,9 @@ class PlatformLocale {
   Future<List<Locale>> get preferredLanguages async {
     final List version = await _channel.invokeMethod('preferredLanguages');
     List<Locale> preferedLocales = List();
-    for(String localeJsonStr in version) {
+    for (String localeJsonStr in version) {
       Map<String, dynamic> localeJson = jsonDecode(localeJsonStr);
-      if(localeJson != null) {
+      if (localeJson != null) {
         final locale = _localeFromJson(localeJson);
         preferedLocales.add(locale);
       }
@@ -35,25 +37,24 @@ class PlatformLocale {
     return preferedLocales;
   }
 
-
   Locale _localeFromJson(Map<String, dynamic> json) {
     if (json == null) {
-    return null;
-  }
-  final _languageCode = json["languageCode"];
-  final _countryCode = json["countryCode"];
-  final _scriptCode = json["scriptCode"];
+      return null;
+    }
+    final _languageCode = json["languageCode"];
+    final _countryCode = json["countryCode"];
+    final _scriptCode = json["scriptCode"];
 
-  if (_scriptCode != null && _countryCode != null && _languageCode != null) {
-    return Locale.fromSubtags(
-        languageCode: _languageCode,
-        countryCode: _countryCode,
-        scriptCode: _scriptCode);
-  } else if (_languageCode != null && _countryCode != null) {
-    return Locale(_languageCode, _countryCode);
-  } else if (_languageCode != null) {
-    return Locale(_languageCode);
-  }
-  return null;
+    if (_scriptCode != null && _countryCode != null && _languageCode != null) {
+      return Locale.fromSubtags(
+          languageCode: _languageCode,
+          countryCode: _countryCode,
+          scriptCode: _scriptCode);
+    } else if (_languageCode != null && _countryCode != null) {
+      return Locale(_languageCode, _countryCode);
+    } else if (_languageCode != null) {
+      return Locale(_languageCode);
+    }
+    return null;
   }
 }

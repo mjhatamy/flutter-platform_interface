@@ -1,15 +1,22 @@
 package io.marands.platform_interface;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 import androidx.core.os.LocaleListCompat;
+
+import org.json.JSONObject;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * PlatformInterfacePlugin
@@ -40,8 +47,31 @@ public class PlatformInterfacePlugin implements MethodCallHandler {
     }
   }
 
+  private String localeToJsonString(Locale locale) {
+    Map<String, String> map = new HashMap<>();
+    if(locale.getLanguage() != null && locale.getLanguage().length() > 0) {
+      map.put("languageCode", locale.getLanguage());
+    }
+    if(locale.getCountry() != null && locale.getCountry().length() > 0) {
+      map.put("countryCode", locale.getCountry());
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      if(locale.getScript() != null && locale.getScript().length() > 0) {
+        map.put("scriptCode", locale.getScript());
+      }
+    }
+
+    if(map.size() <= 0) {
+      return null;
+    }
+
+    JSONObject obj=new JSONObject(map);
+    return obj.toString();
+  }
+
   private String getCurrentLocale() {
-    return Locale.getDefault().toString();
+    Locale locale = Locale.getDefault();
+    return localeToJsonString(locale);
   }
 
   private List<String> getPreferredLanguages() {
@@ -50,12 +80,12 @@ public class PlatformInterfacePlugin implements MethodCallHandler {
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
       LocaleListCompat list = LocaleListCompat.getAdjustedDefault();
       for (int i = 0; i < list.size(); i++) {
-        result.add(list.get(i).toString());
+        Locale locale = list.get(i);
+        result.add(localeToJsonString(locale));
       }
     } else {
       result.add(getCurrentLocale());
     }
-
     return result;
   }
 }
