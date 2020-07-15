@@ -28,15 +28,15 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       languages = await PlatformInterface.locale.preferredLanguages;
-      print(languages);
+      print("languages: $languages\n");
     } on PlatformException {
-      print("Error obtaining preferred languages");
+      print("Error obtaining preferred languages\n");
     }
     try {
       currentLocale = await PlatformInterface.locale.currentLocale;
       print(currentLocale);
     } on PlatformException {
-      print("Error obtaining current locale");
+      print("Error obtaining current locale\n");
     }
 
     // If the widget was removed from the tree while the asynchronous platform
@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
   void listLanguages() async {
     List languages = await PlatformInterface.locale.preferredLanguages;
     Locale locale = await PlatformInterface.locale.currentLocale;
-    print('current locale: $locale, preferred device languages:');
+    print('current locale: $locale, preferred device languages: $languages');
     languages.forEach((l) => print(l));
   }
 }

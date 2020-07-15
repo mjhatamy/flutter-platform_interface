@@ -7,7 +7,7 @@
 //
 
 #import "PlatformInterfacePlugin.h"
-
+#import "pigeon_platform_locale.h"
 
 @implementation PlatformInterfacePlugin
 
@@ -21,20 +21,24 @@
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
   if ([@"preferredLanguages" isEqualToString: call.method]) {
-      NSMutableArray<NSString *> *array = [[NSMutableArray<NSString *> alloc] init];
+      NSMutableArray<NSDictionary *> *array = [[NSMutableArray<NSDictionary *> alloc] init];
       for(NSString *langId in [NSLocale preferredLanguages]) {
           NSLocale *locale = [NSLocale localeWithLocaleIdentifier: langId];
           if(locale != NULL) {
-              NSString *value = [locale toJsonString];
+              PiLocale *value = [locale toPiLocale];
               if(value != NULL)
-                  [array addObject: value];
+                  [array addObject: [value toMap]];
           } else {
               NSLog(@"Unable to parse languageId: %@ to NSLocale", langId);
           }
       }
-      result(array);
+      FlutterError *error;
+      result(wrapResult2(array, error));
+      //result(wrapResult([array toMap], error));
+      //result(array);
   } else if([@"currentLocale" isEqualToString: call.method]){
-      result([[NSLocale currentLocale] toJsonString]);
+      FlutterError *error;
+      result(wrapResult( [[[NSLocale currentLocale] toPiLocale] toMap], error));
   } else {
       result(FlutterMethodNotImplemented);
   }

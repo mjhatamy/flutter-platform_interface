@@ -23,6 +23,14 @@ import java.util.Map;
  */
 public class PlatformInterfacePlugin implements MethodCallHandler {
 
+  private static HashMap wrapError(Exception exception) {
+    HashMap<String, Object> errorMap = new HashMap<>();
+    errorMap.put("message", exception.toString());
+    errorMap.put("code", null);
+    errorMap.put("details", null);
+    return errorMap;
+  }
+
   /**
    * Plugin registration.
    */
@@ -69,23 +77,49 @@ public class PlatformInterfacePlugin implements MethodCallHandler {
     return obj.toString();
   }
 
-  private String getCurrentLocale() {
-    Locale locale = Locale.getDefault();
-    return localeToJsonString(locale);
+  private pigeon_platform_locale.PiLocale localeToPiLocale(Locale locale) {
+    Map<String, String> map = new HashMap<>();
+    pigeon_platform_locale.PiLocale piLocale = new pigeon_platform_locale.PiLocale();
+    if(locale.getLanguage() != null && locale.getLanguage().length() > 0) {
+      piLocale.setLanguageCode(locale.getLanguage());
+    }
+    if(locale.getCountry() != null && locale.getCountry().length() > 0) {
+      piLocale.setCountryCode(piLocale.getCountryCode());
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      if(locale.getScript() != null && locale.getScript().length() > 0) {
+        piLocale.setScriptCode(locale.getScript());
+      }
+    }
+    return piLocale;
   }
 
-  private List<String> getPreferredLanguages() {
-    List<String> result = new ArrayList<String>();
+  private HashMap<String, Object> getCurrentLocale() {
+    HashMap<String, Object> wrapped = new HashMap<>();
+    Locale locale = Locale.getDefault();
+    wrapped.put("result", localeToPiLocale(locale).toMap());
+    return wrapped;
+  }
+
+  private HashMap<String, Object> getPreferredLanguages() {
+    HashMap<String, Object> wrapped = new HashMap<>();
+    List<HashMap<Object, Object>> result = new ArrayList<HashMap<Object, Object>>();
 
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
       LocaleListCompat list = LocaleListCompat.getAdjustedDefault();
       for (int i = 0; i < list.size(); i++) {
         Locale locale = list.get(i);
-        result.add(localeToJsonString(locale));
+        pigeon_platform_locale.PiLocale piLocale = localeToPiLocale(locale);
+        HashMap item = piLocale.toMap();
+        if(item != null) {
+          result.add(item);
+        }
       }
     } else {
-      result.add(getCurrentLocale());
+      Locale locale = Locale.getDefault();
+      result.add(localeToPiLocale(locale).toMap());
     }
-    return result;
+    wrapped.put("result", result);
+    return wrapped;
   }
 }

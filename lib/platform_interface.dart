@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'locale_extension.dart';
+import 'platform_locale.dart';
 
 /// A Simple plug-in that can be used to interogate a device( iOS or Android) to obtain a list of current set up locales and languages
 class PlatformInterface {

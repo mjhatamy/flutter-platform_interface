@@ -9,10 +9,12 @@
 #import <Flutter/Flutter.h>
 
 NS_ASSUME_NONNULL_BEGIN
+@class PiLocale;
 
 @interface NSLocale(Extension)
 
 - (NSString *) toJsonString;
+- (PiLocale *) toPiLocale;
 
 @end
 

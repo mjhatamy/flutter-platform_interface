@@ -7,6 +7,7 @@
 //
 
 #import "NSLocale+Extension.h"
+#import "pigeon_platform_locale.h"
 
 @implementation NSLocale (Extension)
 
@@ -61,6 +62,36 @@
         jsonString = @"{}";
     }
     return jsonString;
+}
+
+- (PiLocale *) toPiLocale {
+    NSString *countryCode;//[[NSLocale currentLocale] objectForKey: NSLocaleCountryCode];
+    if (@available(iOS 10.0, *)) {
+        countryCode = [self countryCode];
+    } else {
+        countryCode = [self objectForKey: NSLocaleCountryCode];
+    }
+    NSString *languageCode;//[[NSLocale currentLocale] objectForKey: NSLocaleLanguageCode];
+    if (@available(iOS 10.0, *)) {
+        languageCode = [self languageCode];
+    } else {
+        languageCode = [self objectForKey: NSLocaleLanguageCode];
+    }
+    NSString *scriptCode;
+    if (@available(iOS 10.0, *)) {
+        scriptCode = [self scriptCode];
+    } else {
+        languageCode = [self objectForKey: NSLocaleScriptCode];
+    }
+    
+    PiLocale *locale = [[PiLocale alloc] init];
+    if(languageCode != nil)
+        locale.languageCode = languageCode;
+    if(countryCode != nil)
+        locale.countryCode = countryCode;
+    if(scriptCode != nil)
+        locale.scriptCode = scriptCode;
+    return locale;
 }
 
 @end

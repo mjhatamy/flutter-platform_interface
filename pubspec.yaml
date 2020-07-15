@@ -1,15 +1,15 @@
 name: platform_interface
 description: A Flutter package that can be used to extract the locales that are currently defined on a device with the current locale set as the first in the list.
-version: 1.0.2
+version: 1.0.4
 homepage: https://github.com/mjhatamy/flutter-platform_interface
 
 environment:
-  sdk: ">=2.0.0 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
   flutter: ">=1.10.0"
 dependencies:
   flutter:
     sdk: flutter
-
+  pigeon: ^0.1.2+1
 # The following section is specific to Flutter.
 flutter:
   # This section identifies this Flutter project as a plugin project.
